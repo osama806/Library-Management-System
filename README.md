@@ -1,66 +1,110 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Library Management System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+The **Library Management System** is a RESTful web service built with PHP and MySQL that allows users to borrow books and return it. As well as rating books by users.
 
-## About Laravel
+## Table of Contents
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- [Library Management System](#library-management-system)
+  - [Table of Contents](#table-of-contents)
+  - [Features](#features)
+  - [Getting Started](#getting-started)
+    - [Prerequisites](#prerequisites)
+    - [Installation](#installation)
+    - [Postman Collection](#postman-collection)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Features
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+1. Books
+  - Add new books to the library
+  - Retrieve details of a specific book or all books
+  - Update book information
+  - Delete books from the library
+  - Search for books by author and available books (not borrowed)
+  - Get ratings average to each book
 
-## Learning Laravel
+2. Ratings
+  - Add new ratings to the books
+  - Retrieve details of a specific book or all books
+  - Update book information
+  - Delete books from the library
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+3. Borrow Records
+  - Add new borrow records to the books
+  - Retrieve details of a specific borrow record or all borrow records
+  - Update borrow record information
+  - Delete borrow records from the books
+  - Return books after borrowed
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+4. Authorization
+  - Registration for new user
+  - Login user
+  - Logout user
+  - Update user profile
+  - Delete user account
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Getting Started
 
-## Laravel Sponsors
+These instructions will help you set up and run the Library Management System on your local machine for development and testing purposes.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+### Prerequisites
 
-### Premium Partners
+- **PHP** (version 7.4 or later)
+- **MySQL** (version 5.7 or later)
+- **Apache** or **Nginx** web server
+- **Composer** (PHP dependency manager, if you are using any PHP libraries)
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
 
-## Contributing
+### Installation
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+1. **Clone the repository**:
 
-## Code of Conduct
+   ```
+   git clone https://github.com/osama806/Library-Management-System.git
+   cd Library-Management-System
+   ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+2. **Set up the environment variables:**:
 
-## Security Vulnerabilities
+  Create a .env file in the root directory and add your database configuration:
+  ```
+  DB_HOST=localhost
+  DB_PORT=3306
+  DB_DATABASE=movie_library
+  DB_USERNAME=root
+  DB_PASSWORD=password
+  ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+3. **Set up the MySQL database:**:
 
-## License
+  - Create a new database in MySQL:
+    ```
+    CREATE DATABASE library-management-system;
+    ```
+  - Run the provided SQL script to create the necessary tables:
+    ```
+    mysql -u root -p library-management-system < database/schema.sql
+    ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+4. **Configure the server**:  
+  - Ensure your web server (Apache or Nginx) is configured to serve PHP files.
+  - Place the project in the appropriate directory (e.g., /var/www/html for Apache on Linux).
+
+5. **Install dependencies (if using Composer)**:
+  ```
+  composer install
+  ```
+
+6. **Start the server:**:
+  - For Apache or Nginx, ensure the server is running.
+  - The API will be accessible at http://localhost/library-management-system.
+
+
+### Postman Collection
+- Link:
+    ```
+    https://documenter.getpostman.com/view/32954091/2sAXjNYAoU#05aa14f6-7eac-4d0b-99e1-52f7a12b94fa
+    ```
+
+    ```
+    https://web.postman.co/workspace/Public-Collections-to-Share~6c698a35-a5d0-4170-b396-cae86a275be3/collection/32954091-794dcee7-bb09-4676-a5e5-d099c3ef4135
+    ```
