@@ -35,13 +35,12 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('books', BookController::class)->except(['index', 'show']);
         Route::apiResource('borrowRecords', BorrowRecordController::class)->except(['index', 'show']);
         Route::post('borrowRecords/due/{id}', [BorrowRecordController::class, 'due']);
-        Route::apiResource('ratings', RatingController::class)->except(['index', 'show']);
+        Route::apiResource('ratings', RatingController::class)->except(['show']);
     });
 
     Route::apiResource('books', BookController::class)->only(['index', 'show']);
     Route::apiResource('borrowRecords', BorrowRecordController::class)->only(['index', 'show']);
-    Route::apiResource('ratings', RatingController::class)->only(['index', 'show']);
-
+    Route::apiResource('ratings', RatingController::class)->only(['show']);
 });
 
 

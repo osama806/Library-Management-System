@@ -64,14 +64,10 @@ class BookFormRequest extends FormRequest
     public function messages()
     {
         return [
-            "title.required"                =>      "Book title is required",
-            "title.unique"                  =>      "Book title must be unique",
-            "title.min"                     =>      "Book title must be at minimum 2 characters",
-            "title.max"                     =>      "Book title must be at maximum 100 characters",
-            "author.required"               =>      "Author name is required",
-            "author.min"                    =>      "Author name must be at minimum 3 characters",
-            "author.max"                    =>      "Author name must be at maximum 100 characters",
-            "description.required"          =>      "Book description is required",
+            "required"                =>      ":attribute is required",
+            "unique"                  =>      ":attribute must be unique",
+            "min"                     =>      ":attribute must be at minimum :min characters",
+            "max"                     =>      ":attribute must be at maximum :max characters",
         ];
     }
 }

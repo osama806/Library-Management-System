@@ -4,10 +4,8 @@ namespace App\Http\Controllers\APIs;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Ratings\RatingFormRequest;
-use App\Models\Rating;
 use App\Services\RatingService;
 use App\Traits\ResponseTrait;
-use Illuminate\Http\Request;
 
 class RatingController extends Controller
 {
@@ -17,18 +15,6 @@ class RatingController extends Controller
     public function __construct(RatingService   $ratingService)
     {
         $this->ratingService = $ratingService;
-    }
-
-    /**
-     * Display a listing of the ratings.
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        $response = $this->ratingService->index();
-        return $response['status']
-            ? $this->getResponse("ratings", $response['ratings'], 200)
-            : $this->getResponse("msg", $response['msg'], 404);
     }
 
     /**

@@ -27,13 +27,13 @@ class AuthController extends Controller
 
     /**
      * Create a new user in storage.
-     * @param \App\Http\Requests\Auth\RegisterRequest $authRequest
+     * @param \App\Http\Requests\Auth\RegisterRequest $registerRequest
      * @return \Illuminate\Http\Response
      */
-    public function register(RegisterRequest $authRequest)
+    public function register(RegisterRequest $registerRequest)
     {
-        $validatedData = $authRequest->validated();
-        $response = $this->authService->register($validatedData);
+        // $validatedData = $registerRequest->validated();
+        $response = $this->authService->register($registerRequest);
         return $response['status']
             ? $this->getResponse("msg", "User registered successfully", 201)
             : $this->getResponse("msg", $response['msg'], $response['code']);

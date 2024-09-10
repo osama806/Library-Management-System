@@ -80,11 +80,27 @@ class BookService
         if (!$book) {
             return ['status'    =>  false, 'msg'    =>  "Not Found This Book"];
         }
+        $ratings = [];
+        $ratings_count = 0;
+        $total_ratings = 0;
+        if ($book->rating()->count() > 0) {
+            foreach ($book->rating as $rating) {
+                $ratings[] = [
+                    "user_name"     =>      $rating->user->name,
+                    "rating"        =>      $rating->rating
+                ];
+                $total_ratings += $rating->rating;
+                $ratings_count++;
+            }
+        }
+        $averageRating = $ratings_count > 0 ? $total_ratings / $ratings_count : null;
         $data = [
             "title"             =>      $book->title,
             "author"            =>      $book->author,
             "description"       =>      $book->description,
-            "published_at"      =>      $book->published_at
+            "published_at"      =>      $book->published_at,
+            "ratings"           =>      $ratings,
+            "ratings_avg"       =>      $averageRating
         ];
         return ['status'    =>  true, 'book'    =>  $data];
     }

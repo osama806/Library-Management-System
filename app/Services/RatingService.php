@@ -15,29 +15,6 @@ class RatingService
     use ResponseTrait;
 
     /**
-     * Display a listing of the ratings.
-     * @return array
-     */
-    public function index()
-    {
-        $ratings = Rating::all();
-
-        if ($ratings->isEmpty()) {
-            return ['status' => false, 'msg' => 'No ratings found.'];
-        }
-
-        $responseData = $ratings->map(function ($rating) {
-            return [
-                'user name'         => $rating->user->name,
-                'book title'        => $rating->book->title,
-                'rating'            => $rating->rating,
-            ];
-        });
-
-        return ['status' => true, 'ratings' => $responseData];
-    }
-
-    /**
      * Display the specified rating.
      * @param mixed $id
      * @return array

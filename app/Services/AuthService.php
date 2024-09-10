@@ -17,23 +17,22 @@ class AuthService
 
     /**
      * Create a new user in storage.
-     * @param array $data
-     * @throws \Exception
-     * @return bool[]
+     * @param mixed $data
+     * @return array
      */
-    public function register(array $data)
+    public function register($data)
     {
         try {
             User::create([
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'password' => bcrypt($data['password']),
-                'as_admin'  =>  $data['as_admin'] ?? 'no'
+                'name'       => $data['name'],
+                'email'      => $data['email'],
+                'password'   => $data['password'],
+                'as_admin'   => $data['as_admin'] ?? 'no'
             ]);
             return ['status'    =>      true];
         } catch (Exception $e) {
             Log::error('Error register user: ' . $e->getMessage());
-            return ['status'    =>  false, 'msg'    =>  'Unable to c. Please try again later.', 'code'  => 500];
+            return ['status'    =>  false, 'msg'    =>  'Unable to create new user. Please try again later.', 'code'  => 500];
         }
     }
 

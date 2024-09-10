@@ -5,6 +5,7 @@ namespace App\Http\Requests\Auth;
 use App\Traits\ResponseTrait;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class RegisterRequest extends FormRequest
@@ -45,6 +46,17 @@ class RegisterRequest extends FormRequest
     }
 
     /**
+     * Modify the request data after validation passes.
+     * @return void
+     */
+    public function passedValidation()
+    {
+        $this->merge([
+            'password'      =>          bcrypt($this->input('password'))
+        ]);
+    }
+
+    /**
      * Get custom attributes for validator errors.
      * @return string[]
      */
@@ -65,14 +77,12 @@ class RegisterRequest extends FormRequest
     public function messages()
     {
         return [
-            'name.required'             =>      'Name is required',
-            'email.required'            =>      'Email address is required.',
-            'email.email'               =>      'Please enter a valid email address.',
-            'email.unique'              =>      'This email address is already registered.',
-            'password.required'         =>      'Password is required.',
-            'password.min'              =>      'Password must be at least 8 characters long.',
-            'password.confirmed'        =>      'Passwords do not match.',
-            'as_admin.in'               =>      'Admin just acceptance two value (yes OR no)'
+            'required'             =>      ':attribute is required',
+            'email'                =>      'Please enter a valid :attribute .',
+            'unique'               =>      'This :attribute is already registered.',
+            'min'                  =>      ':attribute must be at least :min characters long.',
+            'confirmed'            =>      ':attribute do not match.',
+            'in'                   =>      ':attribute just acceptance two value (yes OR no)'
         ];
     }
 }
