@@ -114,7 +114,7 @@ class BookService
     public function store(array $data)
     {
         $user = Auth::user();
-        if ($user->is_admin == false) {
+        if ($user->is_admin == 0) {
             return ['status' => false, 'msg' => 'Not have administration permissions', 'code' => 400];
         }
         $date = Carbon::now();
@@ -141,7 +141,7 @@ class BookService
     public function update(array $data, $id)
     {
         $user = Auth::user();
-        if ($user->is_admin == false) {
+        if ($user->is_admin == 0) {
             return ['status' => false, 'msg' => 'Not have administration permissions', 'code' => 400];
         }
         $book = Book::find($id);
@@ -168,7 +168,7 @@ class BookService
     public function destroy($id)
     {
         $user = Auth::user();
-        if ($user->is_admin == false) {
+        if ($user->is_admin == 0) {
             return ['status' => false, 'msg' => 'Not have administration permissions', 'code' => 400];
         }
         $book = Book::find($id);

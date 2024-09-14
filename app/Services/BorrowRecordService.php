@@ -163,7 +163,7 @@ class BorrowRecordService
     public function destroy($id)
     {
         $user = Auth::user();
-        if ($user->is_admin == false) {
+        if ($user->is_admin == 0) {
             return ['status' => false, 'msg' => 'Not have administration permissions', 'code' => 400];
         }
         $borrow = BorrowRecord::find($id);

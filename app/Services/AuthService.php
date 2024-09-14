@@ -29,7 +29,7 @@ class AuthService
                 'name'       => $data['name'],
                 'email'      => $data['email'],
                 'password'   => $data['password'],
-                'is_admin'   => $data['is_admin'] ?? false
+                'is_admin'   => $data['is_admin'] ?? 0
             ]);
             return ['status'    =>      true];
         } catch (Exception $e) {
@@ -93,7 +93,7 @@ class AuthService
         $data = [
             "name"          =>      $user->name,
             "email"         =>      $user->email,
-            "is_admin"      =>      $user->is_admin == true ? 'Yes' : 'No'
+            "is_admin"      =>      $user->is_admin == 1 ? 'Yes' : 'No'
         ];
         return ['status'    =>      true, 'profile'     =>      $data];
     }
