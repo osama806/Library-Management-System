@@ -28,7 +28,8 @@ class RatingService
         $data = [
             "user name"             =>      $rating->user->name,
             "book title"            =>      $rating->book->title,
-            "rating"                =>      $rating->rating
+            "rating"                =>      $rating->rating,
+            "review"                =>      $rating->review
         ];
         return ['status'    =>  true, 'rating'    =>  $data];
     }
@@ -46,7 +47,7 @@ class RatingService
         }
 
         $borrow = BorrowRecord::where('book_id', $data['book_id'])->where('user_id', Auth::id())->first();
-        if ($borrow) {
+        if (!$borrow) {
             return ['status' => false, 'msg' => 'You don\'t borrowed this book. Try after borrow', 'code' => 400];
         }
 
@@ -60,6 +61,7 @@ class RatingService
                 "user_id"       =>      Auth::id(),
                 "book_id"       =>      $data['book_id'],
                 "rating"        =>      $data['rating'],
+                "review"        =>      $data['review'] ?? null
             ]);
             return ['status'    =>  true];
         } catch (Exception $e) {
@@ -76,23 +78,16 @@ class RatingService
      */
     public function update(array $data, $id)
     {
-        $rating = Rating::find($id);
+        $rating = Rating::where('id', $id)->where('user_id', Auth::id())->first();
         if (!$rating) {
             return ['status'    =>  false, 'msg'    =>  "Not Found This Rating", 'code' =>  404];
         }
-        $book = Book::find($data['book_id']);
-        if (!$book) {
-            return ['status'    =>  false, 'msg'    =>  "Not Found This Book", 'code' =>  404];
-        }
-        $borrow = BorrowRecord::where('book_id', $data['book_id'])->where('user_id', Auth::id())->first();
-        if (!$borrow) {
-            return ['status'    =>  false, 'msg'    =>  "You don't borrowed this book", 'code' =>  400];
-        }
-
         try {
-            $rating->book_id = $data['book_id'];
-            $rating->rating = $data['rating'];
-            $rating->save();
+            $filteredData = array_filter($data, function ($value) {
+                return !is_null($value) && trim($value) !== '';
+            });
+
+            $rating->update($filteredData);
             return ['status'    =>  true];
         } catch (Exception $e) {
             Log::error('Error update rating: ' . $e->getMessage());
@@ -107,13 +102,9 @@ class RatingService
      */
     public function destroy($id)
     {
-        $rating = Rating::find($id);
+        $rating = Rating::where('id', $id)->where('user_id', Auth::id())->first();
         if (!$rating) {
             return ['status' => false, 'msg' => 'Not Found This rating', 'code' => 404];
-        }
-        $user = Auth::user();
-        if ($user->as_admin == 'no') {
-            return ['status' => false, 'msg' => 'Not have administration permissions', 'code' => 400];
         }
         $rating->delete();
         return ['status'    =>  true];

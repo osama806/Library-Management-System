@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->enum('as_admin', ['yes', 'no'])->default('no')->after('remember_token');
+        Schema::table('ratings', function (Blueprint $table) {
+            $table->text('review')->nullable()->after('rating');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            //
+        Schema::table('ratings', function (Blueprint $table) {
+            $table->dropColumn('review');
         });
     }
 };

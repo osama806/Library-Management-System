@@ -23,6 +23,7 @@ Route::prefix('auth')->controller(AuthController::class)->group(function () {
     Route::middleware('auth:api')->group(function () {
         Route::get('user/profile', 'show');
         Route::put('user/profile', 'updateProfile');
+        Route::put('user/change-password', 'changePassword');
         Route::post('logout', 'logout');
         Route::delete('user/delete', 'deleteUser');
     });

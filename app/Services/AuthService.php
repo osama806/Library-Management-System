@@ -6,6 +6,8 @@ use App\Models\User;
 use App\Traits\ResponseTrait;
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
@@ -27,7 +29,7 @@ class AuthService
                 'name'       => $data['name'],
                 'email'      => $data['email'],
                 'password'   => $data['password'],
-                'as_admin'   => $data['as_admin'] ?? 'no'
+                'is_admin'   => $data['is_admin'] ?? false
             ]);
             return ['status'    =>      true];
         } catch (Exception $e) {
@@ -56,6 +58,32 @@ class AuthService
     }
 
     /**
+     * Change password
+     * @param array $data
+     * @return array
+     */
+    public function changePassword(array $data)
+    {
+        $user = Auth::user();
+
+        // Check if the current password matches
+        if (!Hash::check($data['current_password'], $user->password)) {
+            return [
+                'status' => false,
+                'msg'    => 'The current password is incorrect.',
+                'code'   => 400
+            ];
+        }
+
+        // Update the user's password
+        $user->password = Hash::make($data['new_password']);
+        $user->save();
+
+        return ['status' => true];
+    }
+
+
+    /**
      * Get user profile data
      * @return array
      */
@@ -65,7 +93,7 @@ class AuthService
         $data = [
             "name"          =>      $user->name,
             "email"         =>      $user->email,
-            "as_admin"      =>      $user->as_admin == 'yes' ? 'Administrator' : 'Non-Administrator'
+            "is_admin"      =>      $user->is_admin == true ? 'Yes' : 'No'
         ];
         return ['status'    =>      true, 'profile'     =>      $data];
     }
@@ -78,18 +106,25 @@ class AuthService
      */
     public function updateProfile(array $data)
     {
-        $user = Auth::user();
         try {
-            $user->name = $data['name'];
-            $user->password = bcrypt($data['password']);
-            $user->as_admin = $data['as_admin'] ?? $user->as_admin;
-            $user->save();
-            return ['status'    =>  true];
+            $user = Auth::user();
+            $filteredData = array_filter($data, function ($value) {
+                return !is_null($value) && trim($value) !== '';
+            });
+            $user->update($filteredData);
+            return ['status' => true];
         } catch (Exception $e) {
-            Log::error('Error update profile: ' . $e->getMessage());
-            return ['status'    =>  false, 'msg'    =>  'Failed update profile for user. Try again', 'code' =>  500];
+            // Log detailed error for troubleshooting
+            Log::error('Error updating profile for user ID ' . $user->id . ': ' . $e->getMessage());
+
+            return [
+                'status' => false,
+                'msg'    => 'Failed to update profile. Please try again.',
+                'code'   => 500
+            ];
         }
     }
+
 
     /**
      * Delete user from storage.
@@ -98,22 +133,29 @@ class AuthService
      */
     public function deleteUser()
     {
-        $user = Auth::user();
         try {
+            // Get the authenticated user before invalidating the token
+            $user = Auth::user();
+
+            // Check if the token is valid
             if (JWTAuth::parseToken()->check()) {
+                // Invalidate the token
                 JWTAuth::invalidate(JWTAuth::getToken());
             }
-            $user->delete();
-            return ['status'    =>  true];
+
+            // Delete the user after the token is invalidated
+            DB::table('users')->where('id', $user->id)->delete();
+
+            return ['status' => true];
         } catch (TokenInvalidException $e) {
             Log::error('Error Invalid token: ' . $e->getMessage());
-            return ['status' => false, 'msg' => 'Invalid token.', 'code'   => 401];
+            return ['status' => false, 'msg' => 'Invalid token.', 'code' => 401];
         } catch (JWTException $e) {
-            Log::error('Error invalidate token: ' . $e->getMessage());
+            Log::error('Error invalidating token: ' . $e->getMessage());
             return ['status' => false, 'msg' => 'Failed to invalidate token, please try again.', 'code' => 500];
         } catch (Exception $e) {
-            Log::error('Error delete user: ' . $e->getMessage());
-            return ['status' => false, 'msg' => 'Failed to delete user, please try again.', 'code'  => 500];
+            Log::error('Error deleting user: ' . $e->getMessage());
+            return ['status' => false, 'msg' => 'Failed to delete user, please try again.', 'code' => 500];
         }
     }
 }

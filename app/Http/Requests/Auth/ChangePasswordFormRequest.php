@@ -1,22 +1,22 @@
 <?php
 
-namespace App\Http\Requests\Ratings;
+namespace App\Http\Requests\Auth;
 
 use App\Traits\ResponseTrait;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
-class RatingFormRequest extends FormRequest
+class ChangePasswordFormRequest extends FormRequest
 {
     use ResponseTrait;
-
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true;
+        return Auth::check();
     }
 
     /**
@@ -27,8 +27,8 @@ class RatingFormRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "book_id"             =>      "required|numeric|min:1",
-            "rating"              =>      "required|numeric|min:1|max:5",
+            "current_password" => "required|string|min:8",  // Only basic validation, manual hash check needed
+            "new_password"     => "required|string|confirmed|min:8",  // Ensure the new password is confirmed and at least 8 characters long
         ];
     }
 
@@ -50,8 +50,8 @@ class RatingFormRequest extends FormRequest
     public function attributes()
     {
         return [
-            "book_id"         =>      "book number",
-            "rating"          =>      "book rating",
+            'current_password' => 'Current Password',
+            'new_password'     => 'New Password',
         ];
     }
 
@@ -62,13 +62,9 @@ class RatingFormRequest extends FormRequest
     public function messages()
     {
         return [
-            'book_id.required' => 'The book number is required.',
-            'book_id.numeric'  => 'The book number must be a numeric value.',
-            'book_id.min'      => 'The book number must be at least 1.',
-            'rating.required'  => 'The book rating is required.',
-            'rating.numeric'   => 'The book rating must be a numeric value.',
-            'rating.min'       => 'The book rating must be at least 1.',
-            'rating.max'       => 'The book rating must not be greater than 5.',
+            "required"  => ":attribute is required",
+            "min"       => ":attribute must be at least :min characters long",
+            "confirmed" => ":attribute does not match the confirmation",
         ];
     }
 }

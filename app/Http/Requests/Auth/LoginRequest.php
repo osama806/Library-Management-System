@@ -62,10 +62,9 @@ class LoginRequest extends FormRequest
     public function messages()
     {
         return [
-            "email.required"        =>      "Email address is required",
-            "email.email"           =>      "Please enter a valid email address",
-            "password.required"     =>      "Password is required",
-            "password.min"          =>      "Password must be at least 8 characters long"
+            "required"        =>      ":attribute is required",
+            "email"           =>      "Please enter a valid :attribute",
+            "min"             =>      ":attribute must be at least :min characters long"
         ];
     }
 }

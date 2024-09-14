@@ -5,8 +5,8 @@ namespace App\Http\Requests\Auth;
 use App\Traits\ResponseTrait;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Hash;
 
 class RegisterRequest extends FormRequest
 {
@@ -21,16 +21,27 @@ class RegisterRequest extends FormRequest
     }
 
     /**
+     * Prepare the data for validation.
+     * @return void
+     */
+    public function prepareForValidation()
+    {
+        $this->merge([
+            'is_admin' => $this->boolean('is_admin', false) // Default to false if not provided
+        ]);
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      * @return string[]
      */
     public function rules()
     {
         return [
-            'name'      => 'required|min:3|max:50',
-            'email'     => 'required|email|unique:users',
+            'name'      => 'required|string|min:3|max:50',
+            'email'     => 'required|email|unique:users,email',
             'password'  => 'required|confirmed|min:8',
-            'as_admin'  => 'nullable|in:yes,no'
+            'is_admin'  => 'nullable|boolean'
         ];
     }
 
@@ -52,7 +63,7 @@ class RegisterRequest extends FormRequest
     public function passedValidation()
     {
         $this->merge([
-            'password'      =>          bcrypt($this->input('password'))
+            'password' => Hash::make($this->input('password'))
         ]);
     }
 
@@ -63,10 +74,10 @@ class RegisterRequest extends FormRequest
     public function attributes()
     {
         return [
-            "name"      =>      "full name",
-            "email"     =>      "email address",
-            "password"  =>      "password",
-            "as_admin"  =>      "admin"
+            "name"      => "Full name",
+            "email"     => "Email address",
+            "password"  => "Password",
+            "is_admin"  => "Admin status"
         ];
     }
 
@@ -77,12 +88,12 @@ class RegisterRequest extends FormRequest
     public function messages()
     {
         return [
-            'required'             =>      ':attribute is required',
-            'email'                =>      'Please enter a valid :attribute .',
-            'unique'               =>      'This :attribute is already registered.',
-            'min'                  =>      ':attribute must be at least :min characters long.',
-            'confirmed'            =>      ':attribute do not match.',
-            'in'                   =>      ':attribute just acceptance two value (yes OR no)'
+            'required'   => ':attribute is required.',
+            'email'      => 'Please enter a valid :attribute.',
+            'unique'     => 'This :attribute is already registered.',
+            'min'        => ':attribute must be at least :min characters long.',
+            'confirmed'  => ':attribute does not match.',
+            'boolean'    => ':attribute must be true or false'
         ];
     }
 }

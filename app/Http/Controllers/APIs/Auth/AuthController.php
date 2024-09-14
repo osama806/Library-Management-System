@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\APIs\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\ChangePasswordFormRequest;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Requests\Auth\UpdateProfileRequest;
@@ -69,6 +70,19 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * Change password
+     * @param \App\Http\Requests\Auth\ChangePasswordFormRequest $changePasswordFormRequest
+     * @return \Illuminate\Http\Response
+     */
+    public function changePassword(ChangePasswordFormRequest $changePasswordFormRequest)
+    {
+        $validatedData = $changePasswordFormRequest->validated();
+        $response = $this->authService->changePassword($validatedData);
+        return $response['status']
+            ? $this->getResponse('msg', 'Changed password successfully', 200)
+            : $this->getResponse('error', $response['msg'], $response['code']);
+    }
 
     /**
      * Get user profile data

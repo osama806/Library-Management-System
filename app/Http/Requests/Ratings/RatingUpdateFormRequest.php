@@ -1,16 +1,15 @@
 <?php
 
-namespace App\Http\Requests\Auth;
+namespace App\Http\Requests\Ratings;
 
 use App\Traits\ResponseTrait;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\ValidationException;
 
-class UpdateProfileRequest extends FormRequest
+class RatingUpdateFormRequest extends FormRequest
 {
     use ResponseTrait;
-
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -27,12 +26,14 @@ class UpdateProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'      => 'nullable|min:3|max:50',
+            "book_id"             =>      "nullable|numeric|min:1",
+            "rating"              =>      "nullable|numeric|min:1|max:5",
+            "review"              =>      "nullable|string|max:256"
         ];
     }
 
     /**
-     * Get message that errors explanation.
+     * Get message that errors explanation
      * @param \Illuminate\Contracts\Validation\Validator $validator
      * @throws \Illuminate\Validation\ValidationException
      * @return never
@@ -49,10 +50,11 @@ class UpdateProfileRequest extends FormRequest
     public function attributes()
     {
         return [
-            "name"      =>      "Full name",
+            "book_id"         =>      "book number",
+            "rating"          =>      "book rating",
+            "review"          =>      "book review"
         ];
     }
-
 
     /**
      * Get custom messages for validator errors.
@@ -61,8 +63,10 @@ class UpdateProfileRequest extends FormRequest
     public function messages()
     {
         return [
-            'min'              =>      ':attribute must be at least :min characters long.',
-            'max'              =>      ':attribute must be at maximum :max characters.',
+            'required'  => ':attribute is required.',
+            'numeric'   => ':attribute must be a numeric value.',
+            'min'       => ':attribute must be at least :min .',
+            'max'       => ':attribute must not be greater than :max .',
         ];
     }
 }

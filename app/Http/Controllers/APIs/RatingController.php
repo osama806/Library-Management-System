@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\APIs;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Ratings\RatingFormRequest;
+use App\Http\Requests\Ratings\RatingStoreFormRequest;
+use App\Http\Requests\Ratings\RatingUpdateFormRequest;
 use App\Services\RatingService;
 use App\Traits\ResponseTrait;
 
@@ -32,12 +33,12 @@ class RatingController extends Controller
 
     /**
      * Store a newly created rating in storage.
-     * @param \App\Http\Requests\Ratings\RatingFormRequest $ratingFormRequest
+     * @param \App\Http\Requests\Ratings\RatingStoreFormRequest $RatingStoreFormRequest
      * @return \Illuminate\Http\Response
      */
-    public function store(RatingFormRequest $ratingFormRequest)
+    public function store(RatingStoreFormRequest $RatingStoreFormRequest)
     {
-        $validated = $ratingFormRequest->validated();
+        $validated = $RatingStoreFormRequest->validated();
         $response = $this->ratingService->store($validated);
         return $response['status']
             ? $this->getResponse("msg", "Created rating successfully", 201)
@@ -46,13 +47,13 @@ class RatingController extends Controller
 
     /**
      * Update the specified rating in storage.
-     * @param \App\Http\Requests\Ratings\RatingFormRequest $ratingFormRequest
+     * @param \App\Http\Requests\Ratings\RatingUpdateFormRequest $ratingUpdateFormRequest
      * @param mixed $id
      * @return \Illuminate\Http\Response
      */
-    public function update(RatingFormRequest $ratingFormRequest, $id)
+    public function update(RatingUpdateFormRequest $ratingUpdateFormRequest, $id)
     {
-        $validatedData = $ratingFormRequest->validated();
+        $validatedData = $ratingUpdateFormRequest->validated();
         $response = $this->ratingService->update($validatedData, $id);
         return $response['status']
             ? $this->getResponse("msg", "Updated rating successfully", 200)
