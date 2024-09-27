@@ -1,6 +1,6 @@
 # Library Management System
 
-The **Library Management System** is a RESTful web service built with PHP and MySQL that allows users to borrow books and return it. As well as rating books by users.
+The **Library Management System** is a RESTful web service built with PHP and MySQL that allows users to borrow books and return it. As well as classification books and rating books by users.
 
 ## Table of Contents
 
@@ -14,23 +14,29 @@ The **Library Management System** is a RESTful web service built with PHP and My
 
 ## Features
 
-1. Books
+1. Categories
+-   Add new categories to the library
+-   Retrieve details of a specific category or all categories with books related it
+-   Update category details
+-   Delete categories from the library
 
--   Add new books to the library
+2. Books
+
+-   Add new books to category
 -   Retrieve details of a specific book or all books
 -   Update book information
--   Delete books from the library
--   Search for books by author and available books (not borrowed)
+-   Delete books from category
+-   Search for books by category, author and available books (not borrowed)
 -   Get ratings average to each book
 
-2. Ratings
+3. Ratings
 
 -   Add new ratings to the books
 -   Retrieve details of a specific book or all books
 -   Update book information
 -   Delete books from the library
 
-3. Borrow Records
+4. Borrow Records
 
 -   Add new borrow records to the books
 -   Retrieve details of a specific borrow record or all borrow records
@@ -38,7 +44,7 @@ The **Library Management System** is a RESTful web service built with PHP and My
 -   Delete borrow records from the books
 -   Return books after borrowed
 
-4. Authorization
+5. Authorization
 
 -   Registration for new user
 -   Login user
