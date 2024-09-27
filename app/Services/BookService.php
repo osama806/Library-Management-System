@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Resources\BookResource;
 use App\Models\Book;
 use App\Traits\ResponseTrait;
 use Carbon\Carbon;
@@ -20,89 +21,28 @@ class BookService
      */
     public function index(array $data)
     {
-        $query = Book::query();
+        $booksQuery = Book::query();
 
-        if (isset($data['author']) && !empty($data['author'])) {
-            $query->where('author', 'like', '%' . $data['author'] . '%');
-        }
+        $booksQuery->author($data['author'] ?? null);
 
-        if (isset($data['available_books']) && !empty($data['available_books'])) {
-            $query->whereDoesntHave('borrowRecord', function ($q) {
-                $q->where('returned_at', '>', now());
-            });
-        }
+        $booksQuery->availableBooks($data['available_books'] ?? null);
 
-        $books = $query->with(['rating.user'])->get();
+        $booksQuery->category($data['category'] ?? null);
 
-        if ($books->isEmpty()) {
-            return ['status' => false, 'msg' => 'No books found.'];
-        }
+        // Get books and ratings related to each book
+        $books = $booksQuery->with(['rating.user'])->get();
 
-        $responseData = [];
-        foreach ($books as $book) {
-            $ratings = [];
-            $totalRating = 0;
-            $ratingCount = 0;
-
-            if ($book->rating->isNotEmpty()) {
-                foreach ($book->rating as $rating) {
-                    $ratings[] = [
-                        "user name" => $rating->user->name,
-                        "rating"    => $rating->rating
-                    ];
-                    $totalRating += $rating->rating;
-                    $ratingCount++;
-                }
-            }
-            $averageRating = $ratingCount > 0 ? $totalRating / $ratingCount : null;
-            $responseData[] = [
-                'title'       => $book->title,
-                'author'      => $book->author,
-                'description' => $book->description,
-                'published_at' => $book->published_at,
-                'ratings'     => $ratings,
-                'average_rating' => $averageRating,
-            ];
-        }
-
-        return ['status' => true, 'books' => $responseData];
+        return ['status' => true, 'books' => BookResource::collection($books)];
     }
-
 
     /**
      * Display the specified book.
-     * @param mixed $id
+     * @param \App\Models\Book $book
      * @return array
      */
-    public function show($id)
+    public function show(Book $book)
     {
-        $book = Book::find($id);
-        if (!$book) {
-            return ['status'    =>  false, 'msg'    =>  "Not Found This Book"];
-        }
-        $ratings = [];
-        $ratings_count = 0;
-        $total_ratings = 0;
-        if ($book->rating()->count() > 0) {
-            foreach ($book->rating as $rating) {
-                $ratings[] = [
-                    "user_name"     =>      $rating->user->name,
-                    "rating"        =>      $rating->rating
-                ];
-                $total_ratings += $rating->rating;
-                $ratings_count++;
-            }
-        }
-        $averageRating = $ratings_count > 0 ? $total_ratings / $ratings_count : null;
-        $data = [
-            "title"             =>      $book->title,
-            "author"            =>      $book->author,
-            "description"       =>      $book->description,
-            "published_at"      =>      $book->published_at,
-            "ratings"           =>      $ratings,
-            "ratings_avg"       =>      $averageRating
-        ];
-        return ['status'    =>  true, 'book'    =>  $data];
+        return ['status'    =>  true, 'book'    =>  new BookResource($book)];
     }
 
     /**
@@ -113,17 +53,14 @@ class BookService
      */
     public function store(array $data)
     {
-        $user = Auth::user();
-        if ($user->is_admin == 0) {
-            return ['status' => false, 'msg' => 'Not have administration permissions', 'code' => 400];
-        }
         $date = Carbon::now();
         try {
             Book::create([
                 "title"         =>      $data['title'],
                 "author"        =>      $data['author'],
                 "description"   =>      $data['description'],
-                "published_at"  =>      $date
+                "published_at"  =>      $date,
+                "category_id"   =>      $data['category_id']
             ]);
             return ['status'    =>  true];
         } catch (Exception $e) {
@@ -135,47 +72,24 @@ class BookService
     /**
      * Update the specified book in storage.
      * @param array $data
-     * @param mixed $id
+     * @param \App\Models\Book $book
      * @return array
      */
-    public function update(array $data, $id)
+    public function update(array $data, Book $book)
     {
-        $user = Auth::user();
-        if ($user->is_admin == 0) {
-            return ['status' => false, 'msg' => 'Not have administration permissions', 'code' => 400];
-        }
-        $book = Book::find($id);
-        if (!$book) {
-            return ['status'    =>  false, 'msg'    =>  "Not Found This Book", 'code'   =>  404];
-        }
-        try {
-            $book->title = $data['title'];
-            $book->author = $data['author'];
-            $book->description = $data['description'];
-            $book->save();
-            return ['status'    =>  true];
-        } catch (Exception $e) {
-            Log::error('Error update book: ' . $e->getMessage());
-            return ['status' => false, 'msg' => 'There is an error on the server', 'code' => 500];
-        }
-    }
+        $filteredData = array_filter($data, function ($value) {
+            return !is_null($value) && trim($value) !== '';
+        });
 
-    /**
-     * Remove the specified book from storage.
-     * @param mixed $id
-     * @return array
-     */
-    public function destroy($id)
-    {
-        $user = Auth::user();
-        if ($user->is_admin == 0) {
-            return ['status' => false, 'msg' => 'Not have administration permissions', 'code' => 400];
+        if (empty($filteredData)) {
+            return [
+                'status'        =>      false,
+                'msg'           =>      'Not Found Any Data in Request',
+                'code'          =>      404
+            ];
         }
-        $book = Book::find($id);
-        if (!$book) {
-            return ['status'    =>  false, 'msg'    =>  "Not Found This Book", "code"   =>  404];
-        }
-        $book->delete();
+
+        $book->update($filteredData);
         return ['status'    =>  true];
     }
 }

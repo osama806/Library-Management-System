@@ -29,36 +29,9 @@ class FilteringFormRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'author'          => 'nullable|string|min:3',
-            'available_books' => 'nullable|string|in:checked',
-        ];
-    }
-
-    /**
-     * Get custom attributes for validator errors.
-     *
-     * @return array<string, string>
-     */
-    public function attributes(): array
-    {
-        return [
-            'author'          => 'author name',
-            'available_books' => 'availability status',
-        ];
-    }
-
-    /**
-     * Get custom messages for validator errors.
-     *
-     * @return array<string, string>
-     */
-    public function messages(): array
-    {
-        return [
-            'author.min'             => 'Author name must be at least 3 characters long.',
-            'author.string'          => 'Author name must be a string.',
-            'available_books.in'     => 'The availability status must be just "checked".',
-            'available_books.string' => 'The availability status must be a string.',
+            'author'            =>    'nullable|string|min:3',
+            'available_books'   =>    'nullable|string|in:checked',
+            'category'          =>    'nullable|string|min:2|exists:categories,name'
         ];
     }
 
@@ -74,5 +47,34 @@ class FilteringFormRequest extends FormRequest
             $validator,
             $this->getResponse('errors', $validator->errors(), 400)
         );
+    }
+
+    /**
+     * Get custom attributes for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            'author'          =>    'Author name',
+            'available_books' =>    'Availability status',
+            'category'        =>    'Category name'
+        ];
+    }
+
+    /**
+     * Get custom messages for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'min'             =>     ':attribute must be at least :min characters long.',
+            'in'              =>     ':attribute must be just "checked".',
+            'string'          =>     ':attribute must be a string.',
+            'exists'          =>     'Selected :attribute does not exist.',
+        ];
     }
 }

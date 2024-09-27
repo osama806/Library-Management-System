@@ -60,11 +60,9 @@ class BorrowRecordFormRequest extends FormRequest
     public function messages()
     {
         return [
-            "book_id.required"          =>      "Book number is required",
-            "book_id.numeric"           =>      "Book number must be at number",
-            "book_id.min"               =>      "Book number must be at minimum 1 character",
-            "borrowed_id.numeric"       =>      "Borrowed number must be a number",
-            "borrowed_id.min"           =>      "Borrowed number must be at least 1",
+            "required"          =>      ":attribute is required",
+            "numeric"           =>      ":attribute must be a number",
+            "min"               =>      ":attribute must be at least :min",
         ];
     }
 }

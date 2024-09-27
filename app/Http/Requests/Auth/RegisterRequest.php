@@ -20,16 +20,6 @@ class RegisterRequest extends FormRequest
         return true;
     }
 
-    /**
-     * Prepare the data for validation.
-     * @return void
-     */
-    public function prepareForValidation()
-    {
-        $this->merge([
-            'is_admin' => $this->boolean('is_admin', false) // Default to false if not provided
-        ]);
-    }
 
     /**
      * Get the validation rules that apply to the request.
@@ -41,7 +31,6 @@ class RegisterRequest extends FormRequest
             'name'      => 'required|string|min:3|max:50',
             'email'     => 'required|email|unique:users,email',
             'password'  => 'required|confirmed|min:8',
-            'is_admin'  => 'nullable|boolean'
         ];
     }
 
@@ -77,7 +66,6 @@ class RegisterRequest extends FormRequest
             "name"      => "Full name",
             "email"     => "Email address",
             "password"  => "Password",
-            "is_admin"  => "Admin status"
         ];
     }
 
@@ -93,7 +81,6 @@ class RegisterRequest extends FormRequest
             'unique'     => 'This :attribute is already registered.',
             'min'        => ':attribute must be at least :min characters long.',
             'confirmed'  => ':attribute does not match.',
-            'boolean'    => ':attribute must be true or false'
         ];
     }
 }

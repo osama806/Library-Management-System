@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\APIs;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Books\BookFormRequest;
+use App\Http\Requests\Books\StoreBookRequest;
 use App\Http\Requests\Books\FilteringFormRequest;
+use App\Http\Requests\Books\UpdateBookRequest;
+use App\Models\Book;
 use App\Services\BookService;
 use App\Traits\ResponseTrait;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class BookController extends Controller
 {
@@ -33,7 +35,7 @@ class BookController extends Controller
         $response = $this->bookService->index($validated);
         return $response['status']
             ? $this->getResponse("books", $response['books'], 200)
-            : $this->getResponse("msg", $response['msg'], 404);
+            : $this->getResponse("error", $response['msg'], 404);
     }
 
     /**
@@ -41,22 +43,22 @@ class BookController extends Controller
      * @param mixed $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Book $book)
     {
-        $response = $this->bookService->show($id);
+        $response = $this->bookService->show($book);
         return $response['status']
             ? $this->getResponse("book", $response['book'], 200)
-            : $this->getResponse("msg", $response['msg'], 404);
+            : $this->getResponse("error", $response['msg'], 404);
     }
 
     /**
      * Store a newly created resource in storage.
-     * @param \App\Http\Requests\Books\BookFormRequest $createBookFormRequest
+     * @param \App\Http\Requests\Books\StoreBookRequest $storeBookRequest
      * @return \Illuminate\Http\Response
      */
-    public function store(BookFormRequest $createBookFormRequest)
+    public function store(StoreBookRequest $storeBookRequest)
     {
-        $validatedData = $createBookFormRequest->validated();
+        $validatedData = $storeBookRequest->validated();
         $response = $this->bookService->store($validatedData);
         return $response['status']
             ? $this->getResponse("msg", "Created book successfully", 201)
@@ -65,29 +67,31 @@ class BookController extends Controller
 
     /**
      * Update the specified book in storage.
-     * @param \App\Http\Requests\Books\BookFormRequest $BookFormRequest
+     * @param \App\Http\Requests\Books\UpdateBookRequest $updateBookRequest
      * @param mixed $id
      * @return \Illuminate\Http\Response
      */
-    public function update(BookFormRequest $BookFormRequest, $id)
+    public function update(UpdateBookRequest $updateBookRequest, Book $book)
     {
-        $validatedData = $BookFormRequest->validated();
-        $response = $this->bookService->update($validatedData, $id);
+        $validatedData = $updateBookRequest->validated();
+        $response = $this->bookService->update($validatedData, $book);
         return $response['status']
             ? $this->getResponse("msg", "Updated book successfully", 200)
-            : $this->getResponse("msg", $response['msg'], 404);
+            : $this->getResponse("error", $response['msg'], 404);
     }
 
     /**
      * Remove the specified book from storage.
-     * @param mixed $id
+     * @param \App\Models\Book $book
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Book $book)
     {
-        $response = $this->bookService->destroy($id);
-        return $response['status']
-            ? $this->getResponse("msg", "Deleted book successfully", 200)
-            : $this->getResponse("msg", $response['msg'], $response['code']);
+        if (!Auth::user()->is_admin) {
+            return $this->getResponse('error', "Can't access to this permission", 400);
+        }
+
+        $book->delete();
+        return $this->getResponse("msg", "Deleted book successfully", 200);
     }
 }

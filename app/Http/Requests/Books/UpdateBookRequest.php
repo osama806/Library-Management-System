@@ -5,9 +5,11 @@ namespace App\Http\Requests\Books;
 use App\Traits\ResponseTrait;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
-class BookFormRequest extends FormRequest
+class UpdateBookRequest extends FormRequest
 {
     use ResponseTrait;
 
@@ -16,7 +18,17 @@ class BookFormRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return Auth::check() && Auth::user()->is_admin == true;
+    }
+
+    /**
+     * Get response for user hasn't permission
+     * @throws \Illuminate\Http\Exceptions\HttpResponseException
+     * @return never
+     */
+    public function failedAuthorization()
+    {
+        throw new HttpResponseException($this->getResponse('error', "Can't access to this permission", 400));
     }
 
     /**
@@ -27,9 +39,10 @@ class BookFormRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "title"             =>      "required|string|unique:books,title|min:2|max:100",
-            "author"            =>      "required|string|min:3|max:100",
-            "description"       =>      "required",
+            "title"             =>      "nullable|string|unique:books,title|min:2|max:100",
+            "author"            =>      "nullable|string|min:3|max:100",
+            "description"       =>      "nullable|string|min:2|max:256",
+            "category_id"       =>      "nullable|numeric|min:1|exists:categories,id"
         ];
     }
 
@@ -51,9 +64,10 @@ class BookFormRequest extends FormRequest
     public function attributes()
     {
         return [
-            "title"         =>      "book title",
-            "author"        =>      "author name",
-            "description"   =>      "book description",
+            "title"         =>      "Book title",
+            "author"        =>      "Author name",
+            "description"   =>      "Book description",
+            "category_id"   =>      "Category number"
         ];
     }
 
@@ -64,10 +78,11 @@ class BookFormRequest extends FormRequest
     public function messages()
     {
         return [
-            "required"                =>      ":attribute is required",
             "unique"                  =>      ":attribute must be unique",
             "min"                     =>      ":attribute must be at minimum :min characters",
             "max"                     =>      ":attribute must be at maximum :max characters",
+            'numeric'                 =>      ':attribute must be a valid number.',
+            'exists'                  =>      'Selected :attribute does not exist.',
         ];
     }
 }

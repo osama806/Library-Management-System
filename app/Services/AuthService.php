@@ -22,15 +22,22 @@ class AuthService
      * @param mixed $data
      * @return array
      */
-    public function register($data)
+    public function register(array $data)
     {
+        $role = false;
+
+        // check if email request contains @admin
+        if (strpos($data['email'], '@admin') !== false) {
+            $role = true;
+        }
         try {
             User::create([
                 'name'       => $data['name'],
                 'email'      => $data['email'],
                 'password'   => $data['password'],
-                'is_admin'   => $data['is_admin'] ?? 0
+                'is_admin'   => $role
             ]);
+
             return ['status'    =>      true];
         } catch (Exception $e) {
             Log::error('Error register user: ' . $e->getMessage());

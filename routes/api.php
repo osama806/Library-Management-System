@@ -3,20 +3,10 @@
 use App\Http\Controllers\APIs\BookController;
 use App\Http\Controllers\APIs\BorrowRecordController;
 use App\Http\Controllers\APIs\Auth\AuthController;
+use App\Http\Controllers\APIs\CategoryController;
 use App\Http\Controllers\APIs\RatingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
 
 
 Route::prefix('auth')->controller(AuthController::class)->group(function () {
@@ -33,11 +23,13 @@ Route::prefix('auth')->controller(AuthController::class)->group(function () {
 
 Route::prefix('v1')->group(function () {
     Route::middleware('auth:api')->group(function () {
+        Route::apiResource('categories', CategoryController::class)->except(['index', 'show']);
         Route::apiResource('books', BookController::class)->except(['index', 'show']);
         Route::apiResource('borrowRecords', BorrowRecordController::class)->except(['index', 'show']);
         Route::post('borrowRecords/due/{id}', [BorrowRecordController::class, 'due']);
         Route::apiResource('ratings', RatingController::class)->except(['show']);
     });
+    Route::apiResource('categories', CategoryController::class)->only(['index', 'show']);
 
     Route::apiResource('books', BookController::class)->only(['index', 'show']);
     Route::apiResource('borrowRecords', BorrowRecordController::class)->only(['index', 'show']);
